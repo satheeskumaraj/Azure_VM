@@ -4,6 +4,8 @@ Before you starting this you need to learn basic thing for Azure and create one 
 
 Once you created the Azure account, We need to do some basic setup for connecting Azure api by using terraform script. Please follow the link https://www.terraform.io/docs/providers/azurerm/guides/azure_cli.html for basic setup. 
 
+Also Please install the terraform on your local or where you are going to execute the terraform script. You can use the following link to install terraform https://www.terraform.io/downloads.html
+
 Now every thing is done. Let me explain about the code. 
 
 Well.. In oder to create VM, we need to create some basic resources to full fill the infrasturacture.
@@ -54,6 +56,7 @@ How to execute the metrics ansible script?
     ansible-playbook Monitoring_Metrics.yml -i inventory -e "ansible_user=########" -e "ansible_password=#########"
 2. If it's password less authentication the use simple below one.
     ansible-playbook Monitoring_Metrics.yml -i inventory
+
 
 
 
