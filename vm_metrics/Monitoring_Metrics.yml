@@ -1,5 +1,5 @@
 ---
-- hosts: localhost
+- hosts: all
   become: true
   tasks:
     - name: CPU Usage
@@ -24,4 +24,4 @@
       shell: vnstat
       register: network
     - debug:
-        var: network.stdout
+        var: network.stdout_lines
