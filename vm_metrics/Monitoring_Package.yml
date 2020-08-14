@@ -1,0 +1,10 @@
+---
+- hosts: localhost
+  become: true
+  tasks:
+    - name: Install aptitude using apt
+      apt: name=aptitude state=latest update_cache=yes force_apt_get=yes
+
+    - name: Install required system packages for monitoring system performence 
+      apt: name={{ item }} state=latest update_cache=yes
+      loop: [ 'sysstat', 'vnstat']

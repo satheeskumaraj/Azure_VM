@@ -1,0 +1,83 @@
+---
+- hosts: localhost
+  become: true
+  tasks:
+    - name: Install aptitude using apt
+      apt: name=aptitude state=latest update_cache=yes force_apt_get=yes
+      tags:
+      - docker_install
+
+    - name: Install required system packages for intalling the docker
+      apt: name={{ item }} state=latest update_cache=yes
+      loop: [ 'apt-transport-https', 'ca-certificates', 'curl', 'software-properties-common', 'python3-pip', 'virtualenv', 'python3-setuptools','python-pip']
+      tags:
+      - docker_install
+
+    - name: Add Docker GPG apt Key
+      apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        state: present
+      tags:
+      - docker_install
+
+    - name: Add Docker Repository
+      apt_repository:
+        repo: deb https://download.docker.com/linux/ubuntu bionic stable
+        state: present
+      tags:
+      - docker_install
+
+    - name: Update apt and install docker-ce
+      apt: update_cache=yes name=docker-ce state=latest
+      tags:
+      - docker_install
+    
+    - name: permission provided to the docker
+      shell: "sudo usermod -aG docker $USER"
+      tags:
+      - docker_install
+
+    - name: Install Docker Module for Python
+      pip:
+        name: docker
+      tags:
+      - docker_install
+
+    - name: Pull default Docker image
+      docker_image:
+        name: "elasticsearch:7.8.1"
+        tag: esearch_v1
+        source: pull
+      tags:
+      - elk_container
+
+    - name: Create default containers
+      docker_container:
+        name: "elasticsearch"
+        image: elasticsearch:7.8.1
+        env:
+          discovery.type: "single-node"
+        ports:
+         - "9200:9200"
+         - "9300:9300"
+        state: started
+      tags:
+      - elk_container
+
+    - name: Health check
+      shell: curl -XGET 'http://localhost:9200/_cluster/health?pretty=true'
+      register: health
+      tags:
+      - elk_health_check
+      
+
+    - name: Print Health check
+      debug: var=health.stdout_lines
+      tags:
+      - elk_health_check
+
+    - name: Get the health status
+      when: '"green" in health.stdout'
+      debug: msg="Elasticsearch contanier healthy"
+      tags:
+      - elk_health_check

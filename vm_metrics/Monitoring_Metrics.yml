@@ -1,0 +1,27 @@
+---
+- hosts: localhost
+  become: true
+  tasks:
+    - name: CPU Usage
+      shell: |
+         CPU=$(sar 1 5 | grep "Average" | sed 's/^.* //')
+         CPU=$( printf "%.0f" $CPU )
+         CPU="$(( 100-$CPU ))"
+         echo "CPU Usage: "$CPU
+      register: cpu
+    - debug:
+        var: cpu.stdout
+    - name: Disk Usage
+      shell: |
+         DiskUse="$( df -h / | awk '{print $5}' )"
+         echo "DiskUse: "$DiskUse
+      register: disk
+
+    - debug:
+        var: disk.stdout
+    
+    - name: Network Usage
+      shell: vnstat
+      register: network
+    - debug:
+        var: network.stdout
